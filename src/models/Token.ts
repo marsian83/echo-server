@@ -6,6 +6,8 @@ const tokenSchema = new Schema<Token>({
   owner: { type: String },
   name: { type: String },
   symbol: { type: String },
+  mintable: { type: Boolean },
+  burnable: { type: Boolean },
 });
 
 export default model<Token>("Token", tokenSchema);

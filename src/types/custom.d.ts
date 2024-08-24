@@ -3,4 +3,6 @@ export interface Token {
   symbol: string;
   owner: string;
   name: string;
+  mintable: boolean;
+  burnable: boolean;
 }
