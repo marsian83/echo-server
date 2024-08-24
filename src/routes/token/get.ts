@@ -13,4 +13,15 @@ export default function attachGetHandlers(router: Router) {
 
     return res.status(200).send({ tokens: tokens, owner: address });
   });
+
+  router.get("/by-address/:address", async (req, res) => {
+    const address = req.params.address;
+
+    if (typeof address != "string" || !isAddress(address))
+      return res.sendStatus(400);
+
+    const token = await Token.findOne({ address: address });
+
+    return res.status(200).send(token);
+  });
 }
