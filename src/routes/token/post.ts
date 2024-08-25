@@ -99,4 +99,40 @@ export default function attachPostHandlers(router: Router) {
 
     return res.sendStatus(200);
   });
+
+  router.post("/update", async (req, res) => {
+    const { address, signature, signedAt } = req.query;
+    const newData = req.body;
+
+    if (typeof address != "string" || !isAddress(address))
+      return res.sendStatus(400);
+    if (typeof signature != "string" || signature.startsWith("0x"))
+      return res.sendStatus(400);
+    if (typeof signedAt != "number" || signedAt < Date.now() - 60 * 60 * 1000)
+      return res.sendStatus(400);
+
+    const token = await Token.findOne({ address: address });
+
+    if (!token) return res.sendStatus(404);
+    if (!isAddress(token.owner)) return res.sendStatus(500);
+
+    const valid = await verifyMessage({
+      address: token.owner,
+      signature: signature as `0x${string}`,
+      message: `${JSON.stringify(newData)}${signedAt}`.replace(/ /g, ""),
+    });
+    if (!valid) return res.sendStatus(401);
+
+    newData.image && (token.image = newData.image);
+    newData.banner && (token.banner = newData.banner);
+    newData.description && (token.description = newData.description);
+    newData.twitter && (token.twitter = newData.twitter);
+    newData.telegram && (token.telegram = newData.telegram);
+    newData.discord && (token.discord = newData.discord);
+    newData.website && (token.website = newData.website);
+
+    await token.save();
+
+    return res.sendStatus(200);
+  });
 }
