@@ -8,6 +8,7 @@ const router = express.Router();
 router.use("/example", exampleRouter);
 router.use("/wallet", walletRouter);
 router.use("/token", tokenRouter);
+router.use("/collection", collectionRouter);
 
 router.get("/", (req, res) => {
   res.send(
