@@ -2,6 +2,7 @@ import express from "express";
 import exampleRouter from "./example";
 import walletRouter from "./wallet";
 import tokenRouter from "./token";
+import collectionRouter from "./collection";
 
 const router = express.Router();
 

@@ -3,6 +3,7 @@ import { getContract, isAddress } from "viem";
 import contractDefinitions from "../../contracts";
 import evm from "../../../evm";
 import Token from "../../models/Token";
+import Collection from "../../models/Collection";
 
 const refreshTimeouts: Record<string, number> = {};
 const refreshCooldown = 10 * 60 * 1000; //ms
@@ -20,39 +21,44 @@ export default function attachPostHandlers(router: Router) {
       return res.sendStatus(400);
 
     let wait = 20 * 1000;
-    const tokenExists = (await Token.exists({ address: address }))
+    const collectionExists = (await Token.exists({ address: address }))
       ? true
       : false;
-    if (tokenExists) wait = 1;
+    if (collectionExists) wait = 1;
 
     setTimeout(async () => {
-      const tokenContract = getContract({
-        ...contractDefinitions.token,
+      const collection = getContract({
+        ...contractDefinitions.publicnft,
         address: address,
         client: evm.client,
       });
 
       try {
-        const name = await tokenContract.read.name();
-        const owner = await tokenContract.read.owner();
-        const symbol = await tokenContract.read.symbol();
-        const mintable = await tokenContract.read.mintable();
-        const burnable = await tokenContract.read.burnable();
-        const newToken = new Token({
-          address: address,
-          name: name,
-          symbol: symbol,
-          owner: owner,
-          mintable: mintable,
-          burnable: burnable,
-        });
+        if (collectionExists) {
+          const owner = await collection.read.owner();
+          await Collection.findOneAndUpdate({ address }, { owner });
 
-        await Token.findOneAndDelete({ address: address });
-        await newToken.save();
+          refreshTimeouts[address] = Date.now() + refreshCooldown;
 
-        refreshTimeouts[address] = Date.now() + refreshCooldown;
+          return res.sendStatus(200);
+        } else {
+          const name = await collection.read.name();
+          const owner = await collection.read.owner();
+          const symbol = await collection.read.symbol();
+          const image = await collection.read.image();
 
-        return res.sendStatus(200);
+          const newCollection = new Collection({
+            address,
+            name,
+            owner,
+            symbol,
+            image,
+            data: [],
+          });
+          await newCollection.save();
+
+          return res.sendStatus(201);
+        }
       } catch (e) {
         return res.sendStatus(404);
       }
