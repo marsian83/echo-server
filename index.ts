@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 app.use("*", (req, res, next) => {
-  console.log(req.path);
+  console.log(req.originalUrl);
   next();
 });
 

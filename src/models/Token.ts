@@ -8,6 +8,7 @@ const tokenSchema = new Schema<Token>({
   symbol: { type: String },
   mintable: { type: Boolean },
   burnable: { type: Boolean },
+  listed: { type: Boolean },
   image: { type: String },
 });
 

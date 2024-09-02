@@ -7,6 +7,7 @@ import {
   http,
   publicActions,
 } from "viem";
+import { privateKeyToAddress } from "viem/accounts";
 import { Chain } from "viem/chains";
 
 if (!process.env.FAUCET_PVT_KEY) throw "Provide Pvt Key";
@@ -54,6 +55,7 @@ const faucetClient = createWalletClient({
   chain: primaryChain,
   transport: http(rpcUrl),
   key: process.env.FAUCET_PVT_KEY,
+  account: privateKeyToAddress(`0x${process.env.FAUCET_PVT_KEY}`),
 }).extend(publicActions);
 
 async function getBlockNumber() {

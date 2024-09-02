@@ -65,8 +65,11 @@ export default function attachPostHandlers(router: Router) {
 
     if (await Token.exists({ address: address })) {
       listingNonceStore[address] = getRandomHex(8);
+      listingNonceStore[
+        address
+      ] = `I consent to listing token with address ${address}\non Echo's token browsing platform\nNonce : ${listingNonceStore[address]}`;
       return res.status(200).send({
-        nonce: `I consent to listing token with address ${address}\non Echo's token browsing platform\nNonce : ${listingNonceStore[address]}`,
+        nonce: listingNonceStore[address],
       });
     } else return res.sendStatus(404);
   });
@@ -76,7 +79,7 @@ export default function attachPostHandlers(router: Router) {
 
     if (typeof address != "string" || !isAddress(address))
       return res.sendStatus(400);
-    if (typeof signature != "string" || signature.startsWith("0x"))
+    if (typeof signature != "string" || !signature.startsWith("0x"))
       return res.sendStatus(400);
 
     const msg = listingNonceStore[address];
