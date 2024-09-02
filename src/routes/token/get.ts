@@ -25,5 +25,9 @@ export default function attachGetHandlers(router: Router) {
     return res.status(200).send(token);
   });
 
-  router.get("/listings", (req, res) => {});
+  router.get("/listings", async (req, res) => {
+    const tokens = await Token.find({ listed: true });
+
+    return res.status(200).send({ tokens: tokens });
+  });
 }
