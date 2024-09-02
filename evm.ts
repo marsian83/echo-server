@@ -9,6 +9,8 @@ import {
 } from "viem";
 import { Chain } from "viem/chains";
 
+if (!process.env.FAUCET_PVT_KEY) throw "Provide Pvt Key";
+
 const openCampusTestnet: Chain = {
   id: 0xa045c,
   name: "Open Campus Codex Sepolia",
@@ -48,8 +50,14 @@ const client = createWalletClient({
   key: pvtKey,
 }).extend(publicActions);
 
+const faucetClient = createWalletClient({
+  chain: primaryChain,
+  transport: http(rpcUrl),
+  key: process.env.FAUCET_PVT_KEY,
+}).extend(publicActions);
+
 async function getBlockNumber() {
   return await client.getBlockNumber();
 }
 
-export default { client, getBlockNumber };
+export default { client, getBlockNumber, faucetClient };
