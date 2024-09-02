@@ -31,25 +31,29 @@ export default function attachPostHandlers(router: Router) {
       });
 
       try {
-        const name = await tokenContract.read.name();
-        const owner = await tokenContract.read.owner();
-        const symbol = await tokenContract.read.symbol();
-        const mintable = await tokenContract.read.mintable();
-        const burnable = await tokenContract.read.burnable();
-        const newToken = new Token({
-          address: address,
-          name: name,
-          symbol: symbol,
-          owner: owner,
-          mintable: mintable,
-          burnable: burnable,
-        });
+        const tokenExists = await Token.exists({ address: address });
 
-        await Token.findOneAndDelete({ address: address });
-        await newToken.save();
+        if (!tokenExists) {
+          const name = await tokenContract.read.name();
+          const owner = await tokenContract.read.owner();
+          const symbol = await tokenContract.read.symbol();
+          const mintable = await tokenContract.read.mintable();
+          const burnable = await tokenContract.read.burnable();
+          const newToken = new Token({
+            address: address,
+            name: name,
+            symbol: symbol,
+            owner: owner,
+            mintable: mintable,
+            burnable: burnable,
+          });
 
+          await newToken.save();
+        } else {
+          const owner = await tokenContract.read.owner();
+          await Token.findOneAndUpdate({ address: address }, { owner: owner });
+        }
         refreshTimeouts[address] = Date.now() + refreshCooldown;
-
         return res.sendStatus(200);
       } catch (e) {
         return res.sendStatus(404);
