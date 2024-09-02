@@ -24,4 +24,6 @@ export default function attachGetHandlers(router: Router) {
 
     return res.status(200).send(token);
   });
+
+  router.get("/listings", (req, res) => {});
 }
