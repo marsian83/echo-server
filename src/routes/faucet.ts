@@ -5,7 +5,8 @@ import contracts from "../contracts";
 const router = express.Router();
 
 const faucet = getContract({
-  ...contracts.faucet,
+  abi: contracts.faucet.abi,
+  address: contracts.faucet.address,
   client: evm.faucetClient,
 });
 
@@ -15,10 +16,15 @@ router.post("/request/:account", (req, res) => {
   if (typeof account != "string" || !isAddress(account))
     return res.sendStatus(400);
 
-  faucet.write
-    .claimEdu([account], { account: evm.faucetClient.account })
+  evm.faucetClient
+    .writeContract({
+      ...contracts.faucet,
+      functionName: "claimEdu",
+      args: [account],
+      account: evm.faucetClient.account,
+    })
     .then(() => res.sendStatus(200))
-    .catch(() => res.sendStatus(500));
+    .catch((e) => console.log(e));
 });
 
 router.get("/config", (req, res) => {
@@ -38,7 +44,7 @@ router.get("/info/:account", (req, res) => {
 
   faucet.read
     .lastEduClaim([account])
-    .then((r) => res.send({ lastClaim: r }))
+    .then((r) => res.send({ lastClaim: r.toString() }))
     .catch(() => res.sendStatus(500));
 });
 
