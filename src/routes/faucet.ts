@@ -24,8 +24,10 @@ router.post("/request/:account", (req, res) => {
 router.get("/config", (req, res) => {
   faucet.read
     .eduClaimConfig()
-    .then((r) => res.send({ amount: r[0], cooldown: r[1] }))
-    .catch(() => res.sendStatus(500));
+    .then((r) =>
+      res.send({ amount: r[0].toString(), cooldown: r[1].toString() })
+    )
+    .catch((e) => res.sendStatus(500));
 });
 
 router.get("/info/:account", (req, res) => {

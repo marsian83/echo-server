@@ -2,6 +2,7 @@ import express from "express";
 import exampleRouter from "./example";
 import walletRouter from "./wallet";
 import tokenRouter from "./token";
+import faucetRouter from "./faucet";
 import collectionRouter from "./collection";
 
 const router = express.Router();
@@ -10,6 +11,7 @@ router.use("/example", exampleRouter);
 router.use("/wallet", walletRouter);
 router.use("/token", tokenRouter);
 router.use("/collection", collectionRouter);
+router.use("/faucet", faucetRouter);
 
 router.get("/", (req, res) => {
   res.send(
