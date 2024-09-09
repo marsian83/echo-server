@@ -54,7 +54,7 @@ const client = createWalletClient({
 const faucetClient = createWalletClient({
   chain: primaryChain,
   transport: http(rpcUrl),
-  key: `0x${process.env.FAUCET_PVT_KEY}`,
+  key: `${process.env.FAUCET_PVT_KEY}`,
   account: privateKeyToAddress(`0x${process.env.FAUCET_PVT_KEY}`),
 }).extend(publicActions);
 
